@@ -8,6 +8,7 @@
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -43,11 +44,6 @@ public class BatchSample {
 			
 			while (rs.next()) {
 				procTimeList.add(rs.getTimestamp(1));
-				System.out.println(editType(rs.getString(2)).getAction());
-				System.out.println(editType(rs.getString(2)).getIo_cd());
-				System.out.println(editType(rs.getString(2)).getUsr_id());
-				System.out.println(editType(rs.getString(2)).getProcess_id());
-				System.out.println(editType(rs.getString(2)).getPower());
 			}
 			
 			
@@ -58,9 +54,28 @@ public class BatchSample {
 		} finally {
 		}	
 		
-		System.out.println(procTimeList.get(0));
-		System.out.println(procTimeList.get(1));
 		timeTaken(procTimeList.get(0), procTimeList.get(1));
+		
+		ArrayList<Work_Log> aList = new ArrayList<Work_Log>();
+		
+		for (int i = 0 ; i < 10 ; i++) {
+			aList.add(new Work_Log(Timestamp.valueOf("2019-03-02 22:33:22.333"), "22222", "33333", "wsde", "feed", "3333"));
+		}
+		
+		HashMap<String, Object> multiMap = setPerfLogParam(aList);
+		
+		ArrayList<Work_Log> a = (ArrayList<Work_Log>) multiMap.get("WorkList");
+		
+		ArrayList<String> b = (ArrayList<String>) multiMap.get("ssnList");
+		
+		
+		for (Work_Log w : a) {
+			System.out.println(w.toString());	
+		}
+		
+		for (String s : b) {
+			System.out.println(s);
+		}
 		
 	}
 	
@@ -69,7 +84,6 @@ public class BatchSample {
 		// generate the instance of Work_Log
 		Work_Log wLog = new Work_Log();
 		ArrayList<String> wColList = new ArrayList<>();
-		
 		
 		Pattern p = Pattern.compile("\\[(.*?)\\]");
 		Matcher m = p.matcher(message);
@@ -100,11 +114,7 @@ public class BatchSample {
 	
 	public static String timeTaken(Timestamp startStamp, Timestamp endStamp) {
 		
-
-		 
-		
 		long diff =  endStamp.getTime() - startStamp.getTime();
-		
 		
 		long diffDays = diff / (24*60*60*1000);
 		long diffHours = diff / (60*60*1000);
@@ -116,8 +126,6 @@ public class BatchSample {
 		System.out.println("hourstaken : " + diffHours);
 		System.out.println("daystaken : " + diffDays);
 		
-		
-		
 		Date d = new Date(sec);
 		
 		Calendar cal = Calendar.getInstance();		
@@ -126,5 +134,103 @@ public class BatchSample {
 		
 		return "";
 	}
+		
+	public static HashMap<String, Object> setPerfLogParam(ArrayList<Work_Log> list){
+		
+		HashMap<String, Object> map = new HashMap<>();
+		
+		
+		
+		ArrayList<Work_Log> perfLogList = new ArrayList<>();				
+		ArrayList<String> sessionList = new ArrayList<>();
+
+		
+		for (Work_Log wLog : list) {
+			perfLogList.add(wLog);
+			sessionList.add(wLog.getProcess_id());
+		}
+
+		map.put("WorkList", perfLogList);
+		map.put("ssnList", sessionList);
+		
+		return map;
+	}
+	
+	
+	/**
+	 *  JAVA BATCH STRUCTURE 
+	 *   try (Connection conn = DriverManager.getConnection(
+                "jdbc:postgresql://127.0.0.1:5432/test", "postgres", "password");
+             PreparedStatement psDDL = conn.prepareStatement(SQL_CREATE);
+             PreparedStatement psInsert = conn.prepareStatement(SQL_INSERT);
+             PreparedStatement psUpdate = conn.prepareStatement(SQL_UPDATE)) {
+
+            // commit all or rollback all, if any errors
+            conn.setAutoCommit(false); // default true
+
+            psDDL.execute();
+
+            // Run list of insert commands
+            psInsert.setString(1, "mkyong");
+            psInsert.setBigDecimal(2, new BigDecimal(10));
+            psInsert.setTimestamp(3, Timestamp.valueOf(LocalDateTime.now()));
+            psInsert.addBatch();
+
+            psInsert.setString(1, "kungfu");
+            psInsert.setBigDecimal(2, new BigDecimal(20));
+            psInsert.setTimestamp(3, Timestamp.valueOf(LocalDateTime.now()));
+            psInsert.addBatch();
+
+            psInsert.setString(1, "james");
+            psInsert.setBigDecimal(2, new BigDecimal(30));
+            psInsert.setTimestamp(3, Timestamp.valueOf(LocalDateTime.now()));
+            psInsert.addBatch();
+
+            int[] rows = psInsert.executeBatch();
+
+            System.out.println(Arrays.toString(rows));
+
+            // Run list of update commands
+            psUpdate.setBigDecimal(1, new BigDecimal(999.99));
+            psUpdate.setString(2, "mkyong");
+            psUpdate.addBatch();
+
+            psUpdate.setBigDecimal(1, new BigDecimal(888.88));
+            psUpdate.setString(2, "james");
+            psUpdate.addBatch();
+
+            int[] rows2 = psUpdate.executeBatch();
+
+            System.out.println(Arrays.toString(rows2));
+
+            conn.commit();
+
+        } catch (SQLException e) {
+            System.err.format("SQL State: %s\n%s", e.getSQLState(), e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    private static final String SQL_INSERT = "INSERT INTO EMPLOYEE (NAME, SALARY, CREATED_DATE) VALUES (?,?,?)";
+
+    private static final String SQL_UPDATE = "UPDATE EMPLOYEE SET SALARY=? WHERE NAME=?";
+
+    private static final String SQL_CREATE = "CREATE TABLE EMPLOYEE"
+            + "("
+            + " ID serial,"
+            + " NAME varchar(100) NOT NULL,"
+            + " SALARY numeric(15, 2) NOT NULL,"
+            + " CREATED_DATE timestamp with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,"
+            + " PRIMARY KEY (ID)"
+            + ")";
+
+	 * 
+	 * 
+	 * 
+	 * */
+	
+	
 	
 }

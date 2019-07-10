@@ -50,6 +50,11 @@ public class Work_Log {
 		this.process_id = process_id;
 		this.power = power;
 	}
+	@Override
+	public String toString() {
+		return "Work_Log [proc_time=" + proc_time + ", action=" + action + ", io_cd=" + io_cd + ", usr_id=" + usr_id
+				+ ", process_id=" + process_id + ", power=" + power + "]";
+	}
 	public Work_Log() {
 		super();
 		// TODO Auto-generated constructor stub
