@@ -159,7 +159,18 @@ public class BatchSample {
 	
 	/**
 	 *  JAVA BATCH STRUCTURE 
-	 *   try (Connection conn = DriverManager.getConnection(
+	 *   package com.mkyong.jdbc.preparestatement;
+
+import java.math.BigDecimal;
+import java.sql.*;
+import java.time.LocalDateTime;
+import java.util.Arrays;
+
+public class BatchUpdate {
+
+    public static void main(String[] args) {
+
+        try (Connection conn = DriverManager.getConnection(
                 "jdbc:postgresql://127.0.0.1:5432/test", "postgres", "password");
              PreparedStatement psDDL = conn.prepareStatement(SQL_CREATE);
              PreparedStatement psInsert = conn.prepareStatement(SQL_INSERT);
@@ -225,6 +236,9 @@ public class BatchSample {
             + " CREATED_DATE timestamp with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,"
             + " PRIMARY KEY (ID)"
             + ")";
+
+}
+
 
 	 * 
 	 * 
