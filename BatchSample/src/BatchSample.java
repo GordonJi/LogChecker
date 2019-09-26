@@ -21,31 +21,46 @@ import java.awt.List;
 import java.math.*;
 
 public class BatchSample {
-
+	Logger logger = Logger.getLogger(BatchSample.class.getName());
+	
 	public static void main(String[] args) {
 		
 		String Driver = "oracle.jdbc.driver.OracleDriver";
 		String url = "jdbc:oracle:thin:@localhost:1521:xe";
 		String USER = "ji";
 		String pass = "1234";
-		
-		Logger logger = Logger.getLogger(BatchSample.class.getName());
-		
-		Connection conn = null;
 		ArrayList<Timestamp> procTimeList = new ArrayList<>();
-		try {
-			Class.forName(Driver);		
-			conn = DriverManager.getConnection(url,USER,pass);
-			PreparedStatement st = conn.prepareStatement(SQL_SEL_WP_LOG);
-			ResultSet rs =  st.executeQuery();
+		
+		
+		
+		try (Connection conn = DriverManager.getConnection(url,USER,pass);			
+			PreparedStatement psDelPerfLog = conn.prepareStatement(SQL_DEL_ONL_PERF);
+			PreparedStatement psDelWorkLog = conn.prepareStatement(SQL_DEL_WORK_LOG);
+			PreparedStatement psSelWpLog = conn.prepareStatement(SQL_SEL_WP_LOG);	
+			PreparedStatement psInsWorkLog = conn.prepareStatement(SQL_INS_WORK_LOG);	
+			PreparedStatement psSelWorkLog = conn.prepareStatement(SQL_SEL_WORK_LOG);
+			PreparedStatement psInsPerfLog = conn.prepareStatement(SQL_INS_ONL_PERF);) {
 			
+			psDelPerfLog.setString(1,PRE_EXEC_TIME);
+			psDelPerfLog.setString(2,EXEC_TIME);
+			psDelPerfLog.setString(3,PRESENT_TIME);			
+			psDelPerfLog.executeBatch();
+			//need some logging how many records deleted
 			
-			while (rs.next()) {
-				procTimeList.add(rs.getTimestamp(1));
+			psDelWorkLog.setString(1,PRE_EXEC_TIME);
+			psDelWorkLog.setString(2,EXEC_TIME);
+			psDelWorkLog.setString(3,PRESENT_TIME);
+			psDelWorkLog.executeBatch();
+			
+			psSelWpLog.setString(1,EXEC_TIME);
+			psSelWpLog.setString(2,PRESENT_TIME);
+			ResultSet rsSelWpLog = psSelWpLog.executeQuery();
+			
+			while (rsSelWpLog.next()) {
+				procTimeList.add(rsSelWpLog.getTimestamp(1));
 			}
-			
-			
-		}catch (SQLException e) {
+	
+		} catch (SQLException e) {
 			e.printStackTrace();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -73,6 +88,10 @@ public class BatchSample {
 			System.out.println(s);
 		}
 		
+	}
+	
+	public String getArg(int...num) {
+		return String.valueOf(num[0]);
 	}
 	
 	public static Work_Log editType(String message) {
@@ -163,6 +182,11 @@ public class BatchSample {
 	
 	private static final String SQL_INS_ONL_PERF="";
 	
+	private static final String PRE_EXEC_TIME = "";
+	
+	private static final String EXEC_TIME = "";
+		
+	private static final String PRESENT_TIME = "";
 	
 	/**
 	 *  JAVA BATCH STRUCTURE 
