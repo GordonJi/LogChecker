@@ -29,8 +29,6 @@ public class BatchSample {
 		String USER = "ji";
 		String pass = "1234";
 		
-		String selectSql = "select * from wp_log";
-		
 		Logger logger = Logger.getLogger(BatchSample.class.getName());
 		
 		Connection conn = null;
@@ -38,7 +36,7 @@ public class BatchSample {
 		try {
 			Class.forName(Driver);		
 			conn = DriverManager.getConnection(url,USER,pass);
-			PreparedStatement st = conn.prepareStatement(selectSql);
+			PreparedStatement st = conn.prepareStatement(SQL_SEL_WP_LOG);
 			ResultSet rs =  st.executeQuery();
 			
 			
@@ -51,8 +49,7 @@ public class BatchSample {
 			e.printStackTrace();
 		} catch (Exception e) {
 			e.printStackTrace();
-		} finally {
-		}	
+		} 
 		
 		timeTaken(procTimeList.get(0), procTimeList.get(1));
 		
@@ -64,8 +61,7 @@ public class BatchSample {
 		
 		HashMap<String, Object> multiMap = setPerfLogParam(aList);
 		
-		ArrayList<Work_Log> a = (ArrayList<Work_Log>) multiMap.get("WorkList");
-		
+		ArrayList<Work_Log> a = (ArrayList<Work_Log>) multiMap.get("WorkList");		
 		ArrayList<String> b = (ArrayList<String>) multiMap.get("ssnList");
 		
 		
@@ -114,8 +110,7 @@ public class BatchSample {
 	
 	public static String timeTaken(Timestamp startStamp, Timestamp endStamp) {
 		
-		long diff =  endStamp.getTime() - startStamp.getTime();
-		
+		long diff =  endStamp.getTime() - startStamp.getTime();		
 		long diffDays = diff / (24*60*60*1000);
 		long diffHours = diff / (60*60*1000);
 		long diffMins =  diff / (60*1000);		
@@ -155,6 +150,18 @@ public class BatchSample {
 		
 		return map;
 	}
+	
+	private static final String SQL_DEL_ONL_PERF = ""; 
+	
+	private static final String SQL_DEL_WORK_LOG = ""; 
+	
+	private static final String SQL_SEL_WP_LOG="";
+	
+	private static final String SQL_INS_WORK_LOG="";
+	
+	private static final String SQL_SEL_WORK_LOG="";
+	
+	private static final String SQL_INS_ONL_PERF="";
 	
 	
 	/**
